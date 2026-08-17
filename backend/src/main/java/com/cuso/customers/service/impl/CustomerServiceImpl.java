@@ -61,6 +61,9 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerResponse update(Long id, CustomerRequest request) {
         Customer entity = getOrThrow(id);
+        if (customerRepository.existsByEmailIgnoreCaseAndIdNot(request.email(), id)) {
+            throw new DuplicateResourceException("Ya existe un cliente con el email '%s'".formatted(request.email()));
+        }
         customerMapper.updateEntityFromRequest(request, entity);
         return customerMapper.toResponse(customerRepository.save(entity));
     }

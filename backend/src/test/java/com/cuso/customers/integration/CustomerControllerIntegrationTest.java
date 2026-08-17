@@ -97,4 +97,108 @@ class CustomerControllerIntegrationTest extends AbstractIntegrationTest {
         mockMvc.perform(get("/api/customers").param("page", "0").param("size", "10"))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    void create_returns400_whenEmailIsInvalid() throws Exception {
+        String body = """
+                {
+                  "name": "Ana Gomez",
+                  "email": "no-es-un-email"
+                }
+                """;
+
+        mockMvc.perform(post("/api/customers")
+                        .with(jwt().authorities(() -> "ROLE_MANAGER"))
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void findById_returns200_whenAuthenticatedWithAnyRole() throws Exception {
+        var customer = customerRepository.save(com.cuso.customers.entity.Customer.builder()
+                .name("Ana Gomez").email("ana.gomez@cuso.com")
+                .registrationDate(java.time.LocalDate.now())
+                .build());
+
+        mockMvc.perform(get("/api/customers/" + customer.getId())
+                        .with(jwt().authorities(() -> "ROLE_USER")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("ana.gomez@cuso.com"));
+    }
+
+    @Test
+    void findById_returns404_whenCustomerDoesNotExist() throws Exception {
+        mockMvc.perform(get("/api/customers/99999")
+                        .with(jwt().authorities(() -> "ROLE_USER")))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void update_returns200_whenAuthenticatedAsManager() throws Exception {
+        var customer = customerRepository.save(com.cuso.customers.entity.Customer.builder()
+                .name("Ana Gomez").email("ana.gomez@cuso.com")
+                .registrationDate(java.time.LocalDate.now())
+                .build());
+
+        String body = """
+                {
+                  "name": "Ana Gomez Actualizada",
+                  "email": "ana.gomez@cuso.com"
+                }
+                """;
+
+        mockMvc.perform(put("/api/customers/" + customer.getId())
+                        .with(jwt().authorities(() -> "ROLE_MANAGER"))
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Ana Gomez Actualizada"));
+    }
+
+    @Test
+    void update_returns403_whenAuthenticatedAsUserOnly() throws Exception {
+        var customer = customerRepository.save(com.cuso.customers.entity.Customer.builder()
+                .name("Ana Gomez").email("ana.gomez@cuso.com")
+                .registrationDate(java.time.LocalDate.now())
+                .build());
+
+        String body = """
+                {
+                  "name": "Ana Gomez Actualizada",
+                  "email": "ana.gomez@cuso.com"
+                }
+                """;
+
+        mockMvc.perform(put("/api/customers/" + customer.getId())
+                        .with(jwt().authorities(() -> "ROLE_USER"))
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void update_returns409_whenEmailBelongsToAnotherCustomer() throws Exception {
+        customerRepository.save(com.cuso.customers.entity.Customer.builder()
+                .name("Carlos Ruiz").email("carlos.ruiz@cuso.com")
+                .registrationDate(java.time.LocalDate.now())
+                .build());
+        var customerToUpdate = customerRepository.save(com.cuso.customers.entity.Customer.builder()
+                .name("Ana Gomez").email("ana.gomez@cuso.com")
+                .registrationDate(java.time.LocalDate.now())
+                .build());
+
+        String body = """
+                {
+                  "name": "Ana Gomez",
+                  "email": "carlos.ruiz@cuso.com"
+                }
+                """;
+
+        mockMvc.perform(put("/api/customers/" + customerToUpdate.getId())
+                        .with(jwt().authorities(() -> "ROLE_MANAGER"))
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isConflict());
+    }
 }

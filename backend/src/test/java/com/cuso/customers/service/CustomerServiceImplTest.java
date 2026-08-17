@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -76,5 +77,94 @@ class CustomerServiceImplTest {
 
         assertThatThrownBy(() -> customerService.findById(99L))
                 .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void update_updatesCustomer_whenDataIsValid() {
+        CustomerRequest request = new CustomerRequest("Ana Gomez Updated", "ana.updated@cuso.com", "3009999999", "Calle 2");
+        Customer existing = Customer.builder()
+                .id(5L).name("Ana Gomez").email("ana.gomez@cuso.com")
+                .registrationDate(LocalDate.now())
+                .build();
+
+        when(customerRepository.findById(5L)).thenReturn(Optional.of(existing));
+        when(customerRepository.existsByEmailIgnoreCaseAndIdNot("ana.updated@cuso.com", 5L)).thenReturn(false);
+        when(customerRepository.save(any(Customer.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        CustomerResponse response = customerService.update(5L, request);
+
+        assertThat(response.name()).isEqualTo("Ana Gomez Updated");
+        assertThat(response.email()).isEqualTo("ana.updated@cuso.com");
+    }
+
+    @Test
+    void update_throwsResourceNotFoundException_whenCustomerDoesNotExist() {
+        CustomerRequest request = new CustomerRequest("Ana Gomez", "ana.gomez@cuso.com", null, null);
+        when(customerRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> customerService.update(99L, request))
+                .isInstanceOf(ResourceNotFoundException.class);
+
+        verify(customerRepository, never()).save(any());
+    }
+
+    @Test
+    void update_throwsDuplicateResourceException_whenEmailBelongsToAnotherCustomer() {
+        CustomerRequest request = new CustomerRequest("Ana Gomez", "otro.cliente@cuso.com", null, null);
+        Customer existing = Customer.builder()
+                .id(5L).name("Ana Gomez").email("ana.gomez@cuso.com")
+                .registrationDate(LocalDate.now())
+                .build();
+
+        when(customerRepository.findById(5L)).thenReturn(Optional.of(existing));
+        when(customerRepository.existsByEmailIgnoreCaseAndIdNot("otro.cliente@cuso.com", 5L)).thenReturn(true);
+
+        assertThatThrownBy(() -> customerService.update(5L, request))
+                .isInstanceOf(DuplicateResourceException.class);
+
+        verify(customerRepository, never()).save(any());
+    }
+
+    @Test
+    void update_allowsSameEmail_whenUpdatingOwnRecord() {
+        CustomerRequest request = new CustomerRequest("Ana Gomez Updated", "ana.gomez@cuso.com", null, null);
+        Customer existing = Customer.builder()
+                .id(5L).name("Ana Gomez").email("ana.gomez@cuso.com")
+                .registrationDate(LocalDate.now())
+                .build();
+
+        when(customerRepository.findById(5L)).thenReturn(Optional.of(existing));
+        when(customerRepository.existsByEmailIgnoreCaseAndIdNot("ana.gomez@cuso.com", 5L)).thenReturn(false);
+        when(customerRepository.save(any(Customer.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        CustomerResponse response = customerService.update(5L, request);
+
+        assertThat(response.name()).isEqualTo("Ana Gomez Updated");
+    }
+
+    @Test
+    void delete_removesCustomer_whenExists() {
+        Customer existing = Customer.builder()
+                .id(5L).name("Ana Gomez").email("ana.gomez@cuso.com")
+                .registrationDate(LocalDate.now())
+                .build();
+        when(customerRepository.findById(5L)).thenReturn(Optional.of(existing));
+
+        customerService.delete(5L);
+
+        // Cast necesario: CustomerRepository hereda delete(T) de CrudRepository
+        // y delete(Specification<T>) de JpaSpecificationExecutor -- sin el cast
+        // el compilador no puede elegir cual de los dos se esta verificando.
+        verify((JpaRepository<Customer, Long>) customerRepository).delete(existing);
+    }
+
+    @Test
+    void delete_throwsResourceNotFoundException_whenCustomerDoesNotExist() {
+        when(customerRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> customerService.delete(99L))
+                .isInstanceOf(ResourceNotFoundException.class);
+
+        verify((JpaRepository<Customer, Long>) customerRepository, never()).delete(any());
     }
 }
