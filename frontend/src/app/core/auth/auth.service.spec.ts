@@ -31,4 +31,16 @@ describe('AuthService', () => {
     expect(service.hasRole('USER')).toBe(true);
     expect(service.hasRole('ADMIN')).toBe(false);
   });
+
+  it('primaryRole prioritizes ADMIN over MANAGER and USER when a user has all three', () => {
+    expect(setup(['USER', 'MANAGER', 'ADMIN']).primaryRole()).toBe('ADMIN');
+  });
+
+  it('primaryRole returns MANAGER when ADMIN is absent but MANAGER is present', () => {
+    expect(setup(['USER', 'MANAGER']).primaryRole()).toBe('MANAGER');
+  });
+
+  it('primaryRole returns null when no recognized realm role is present', () => {
+    expect(setup(['some-other-role']).primaryRole()).toBeNull();
+  });
 });

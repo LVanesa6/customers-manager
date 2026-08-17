@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { HasRolesDirective } from 'keycloak-angular';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { CustomerListComponent } from './customer-list.component';
 import { CustomerService } from '../customer.service';
@@ -30,6 +30,7 @@ describe('CustomerListComponent', () => {
   let customerServiceMock: Partial<jest.Mocked<CustomerService>>;
 
   const emptyPage = { content: [], page: 0, size: 10, totalElements: 0, totalPages: 0, last: true };
+  const emptyFilter = { name: '', email: '', phone: '', address: '', registrationDateFrom: null, registrationDateTo: null };
 
   beforeEach(() => {
     customerServiceMock = { findAll: jest.fn().mockReturnValue(of(emptyPage)) };
@@ -49,19 +50,18 @@ describe('CustomerListComponent', () => {
     const fixture = TestBed.createComponent(CustomerListComponent);
     fixture.detectChanges();
 
-    expect(customerServiceMock.findAll).toHaveBeenCalledWith(0, 10, { name: '' });
+    expect(customerServiceMock.findAll).toHaveBeenCalledWith(0, 10, emptyFilter);
   });
 
-  it('reloads with the new page index and size when the paginator emits an event', () => {
+  it('reloads with the new page index when the paginator emits a page change', () => {
     const fixture = TestBed.createComponent(CustomerListComponent);
     fixture.detectChanges();
     const component = fixture.componentInstance;
 
-    component.loadPage({ pageIndex: 2, pageSize: 25, length: 0 });
+    component.onPageChange(2);
 
     expect(component.pageIndex()).toBe(2);
-    expect(component.pageSize()).toBe(25);
-    expect(customerServiceMock.findAll).toHaveBeenLastCalledWith(2, 25, { name: '' });
+    expect(customerServiceMock.findAll).toHaveBeenLastCalledWith(2, 10, emptyFilter);
   });
 
   it('resets to the first page when filters are applied', () => {
@@ -69,11 +69,35 @@ describe('CustomerListComponent', () => {
     fixture.detectChanges();
     const component = fixture.componentInstance;
 
-    component.loadPage({ pageIndex: 3, pageSize: 10, length: 0 });
+    component.onPageChange(3);
     component.filterForm.controls.name.setValue('Gomez');
     component.applyFilters();
 
     expect(component.pageIndex()).toBe(0);
-    expect(customerServiceMock.findAll).toHaveBeenLastCalledWith(0, 10, { name: 'Gomez' });
+    expect(customerServiceMock.findAll).toHaveBeenLastCalledWith(0, 10, { ...emptyFilter, name: 'Gomez' });
+  });
+
+  it('sets loadError to true when loading fails, instead of leaving a silent empty table', () => {
+    customerServiceMock.findAll = jest.fn().mockReturnValue(throwError(() => new Error('network down')));
+
+    const fixture = TestBed.createComponent(CustomerListComponent);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+
+    expect(component.loadError()).toBe(true);
+    expect(component.loading()).toBe(false);
+  });
+
+  it('clears loadError and reloads when retrying after a failed load', () => {
+    customerServiceMock.findAll = jest.fn().mockReturnValue(throwError(() => new Error('network down')));
+    const fixture = TestBed.createComponent(CustomerListComponent);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+    expect(component.loadError()).toBe(true);
+
+    customerServiceMock.findAll = jest.fn().mockReturnValue(of(emptyPage));
+    component.loadPage();
+
+    expect(component.loadError()).toBe(false);
   });
 });

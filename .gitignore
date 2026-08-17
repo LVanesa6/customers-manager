@@ -28,6 +28,3 @@ infra/terraform/*.plan
 
 # Env
 .env
-
-# Claude Code (config/local session data, no debe ir al repo)
-.claude/
