@@ -41,7 +41,7 @@ management:
 
 info:
   environment: PROD
-  descripcion: Ambiente productivo -- esquema validado (no autogestionado), logs minimos, swagger deshabilitado. Desplegado via GitHub Actions.
+  descripcion: Ambiente productivo -- esquema validado (no autogestionado), logs minimos, swagger deshabilitado
 
 app:
   startup-message: "Ejecutando en PROD"
