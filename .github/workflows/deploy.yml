@@ -1,0 +1,136 @@
+name: Deploy a AWS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "infra/keycloak/**"
+      - ".github/workflows/deploy.yml"
+
+permissions:
+  id-token: write # necesario para autenticar con AWS via OIDC (sin llaves)
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  PROJECT_NAME: cuso-customers
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      keycloak: ${{ steps.filter.outputs.keycloak }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            frontend:
+              - 'frontend/**'
+            keycloak:
+              - 'infra/keycloak/**'
+
+  deploy-backend:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: aws-actions/amazon-ecr-login@v2
+        id: ecr
+
+      - name: Build y push de la imagen del backend
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+        run: |
+          docker build --platform linux/amd64 \
+            -t "$REGISTRY/${{ env.PROJECT_NAME }}-backend:${{ github.sha }}" \
+            -t "$REGISTRY/${{ env.PROJECT_NAME }}-backend:latest" \
+            backend
+          docker push "$REGISTRY/${{ env.PROJECT_NAME }}-backend:${{ github.sha }}"
+          docker push "$REGISTRY/${{ env.PROJECT_NAME }}-backend:latest"
+
+      - name: Forzar redeploy del servicio ECS
+        run: |
+          aws ecs update-service \
+            --cluster "${{ env.PROJECT_NAME }}-cluster" \
+            --service "${{ env.PROJECT_NAME }}-backend" \
+            --force-new-deployment
+
+  deploy-keycloak:
+    needs: changes
+    if: needs.changes.outputs.keycloak == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: aws-actions/amazon-ecr-login@v2
+        id: ecr
+
+      - name: Build y push de la imagen de Keycloak (realm + tema incluidos)
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+        run: |
+          docker build --platform linux/amd64 \
+            -t "$REGISTRY/${{ env.PROJECT_NAME }}-keycloak:${{ github.sha }}" \
+            -t "$REGISTRY/${{ env.PROJECT_NAME }}-keycloak:latest" \
+            infra/keycloak
+          docker push "$REGISTRY/${{ env.PROJECT_NAME }}-keycloak:${{ github.sha }}"
+          docker push "$REGISTRY/${{ env.PROJECT_NAME }}-keycloak:latest"
+
+      - name: Forzar redeploy del servicio ECS
+        run: |
+          aws ecs update-service \
+            --cluster "${{ env.PROJECT_NAME }}-cluster" \
+            --service "${{ env.PROJECT_NAME }}-keycloak" \
+            --force-new-deployment
+
+  deploy-frontend:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build de produccion (Angular)
+        working-directory: frontend
+        run: |
+          npm ci
+          npx ng build --configuration production
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Subir a S3 e invalidar cache de CloudFront
+        run: |
+          aws s3 sync frontend/dist/frontend/browser \
+            "s3://${{ env.PROJECT_NAME }}-frontend" --delete
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --paths "/*"

@@ -1,0 +1,47 @@
+server:
+  port: 9090
+
+spring:
+  application:
+    name: customers-prod
+  jpa:
+    show-sql: false
+    hibernate:
+      # validate: en prod el esquema NUNCA se toca solo -- si no coincide con
+      # las entidades, la app ni siquiera arranca. Los cambios de esquema en
+      # prod deberian pasar por una migracion revisada, no por autogestion.
+      ddl-auto: validate
+  datasource:
+    hikari:
+      maximum-pool-size: 20
+
+# En prod los logs se reducen a lo operativo: nada de SQL ni parametros
+# (podrian filtrar datos de clientes en texto plano), solo warnings/errores.
+logging:
+  level:
+    root: WARN
+    com.cuso.customers: INFO
+    org.hibernate.SQL: WARN
+
+springdoc:
+  # La documentacion interactiva de la API no deberia quedar publica en un
+  # ambiente productivo real.
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # En prod solo se expone lo minimo para un healthcheck -- nada que
+        # revele configuracion interna, beans o mapeos de rutas.
+        include: health,info
+
+info:
+  environment: PROD
+  descripcion: Ambiente productivo -- esquema validado (no autogestionado), logs minimos, swagger deshabilitado. Desplegado via GitHub Actions.
+
+app:
+  startup-message: "Ejecutando en PROD"

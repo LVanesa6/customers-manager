@@ -1,0 +1,82 @@
+<mat-toolbar color="primary">
+  {{ userId() ? (viewMode() ? 'Detalle del usuario' : 'Editar usuario') : 'Nuevo usuario' }}
+</mat-toolbar>
+
+<div class="page">
+  <form [formGroup]="form" (ngSubmit)="save()" class="form-card" [class.readonly]="viewMode()">
+    <mat-form-field appearance="outline">
+      <mat-label>Usuario</mat-label>
+      <input matInput formControlName="username" required />
+      @if (form.controls.username.hasError('required')) {
+        <mat-error>El usuario es obligatorio</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" required />
+      @if (form.controls.email.hasError('required')) {
+        <mat-error>El email es obligatorio</mat-error>
+      }
+      @if (form.controls.email.hasError('email')) {
+        <mat-error>El email no tiene un formato valido</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="firstName" required />
+      @if (form.controls.firstName.hasError('required')) {
+        <mat-error>El nombre es obligatorio</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Apellido</mat-label>
+      <input matInput formControlName="lastName" required />
+      @if (form.controls.lastName.hasError('required')) {
+        <mat-error>El apellido es obligatorio</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Rol</mat-label>
+      <mat-select formControlName="role" required>
+        @for (role of roles; track role) {
+          <mat-option [value]="role">{{ role }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    @if (!viewMode()) {
+      <mat-form-field appearance="outline">
+        <mat-label>{{ userId() ? 'Nueva contrasena (opcional)' : 'Contrasena' }}</mat-label>
+        <input matInput type="password" formControlName="password" />
+        @if (form.controls.password.hasError('required')) {
+          <mat-error>La contrasena es obligatoria</mat-error>
+        }
+        @if (form.controls.password.hasError('minlength')) {
+          <mat-error>La contrasena debe tener al menos 6 caracteres</mat-error>
+        }
+        @if (userId()) {
+          <mat-hint>Dejar en blanco para no cambiarla. Si la cambias, el usuario debera definir una nueva en su proximo inicio de sesion</mat-hint>
+        } @else {
+          <mat-hint>El usuario debera cambiarla en su primer inicio de sesion</mat-hint>
+        }
+      </mat-form-field>
+    }
+
+    <div class="actions">
+      @if (viewMode()) {
+        <button mat-button type="button" (click)="goBack()">Volver</button>
+        <button mat-flat-button color="primary" type="button" (click)="enableEdit()">
+          <mat-icon>edit</mat-icon>
+          Editar
+        </button>
+      } @else {
+        <button mat-button type="button" (click)="cancel()">Cancelar</button>
+        <button mat-flat-button color="primary" type="submit" [disabled]="saving()">Guardar cambios</button>
+      }
+    </div>
+  </form>
+</div>

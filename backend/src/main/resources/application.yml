@@ -1,0 +1,64 @@
+spring:
+  profiles:
+    active: dev
+
+  datasource:
+    # MySQL genera un certificado autofirmado por defecto, por eso los datos van
+    # cifrados en transito (useSSL/requireSSL) pero no validamos el certificado contra
+    # una CA (verifyServerCertificate=false) ya que no es un certificado publico.
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:customers_db}?useSSL=true&requireSSL=true&verifyServerCertificate=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USER:customers_user}
+    password: ${DB_PASSWORD:customers_pass}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    oauth:
+      client-id: ${KEYCLOAK_CLIENT_ID:customers-app}
+  api-docs:
+    path: /v3/api-docs
+
+app:
+  security:
+    keycloak:
+      client-id: ${KEYCLOAK_CLIENT_ID:customers-app}
+      # issuer-uri: valor EXACTO esperado en el claim "iss" de los tokens (el
+      # dominio publico por el que entran los usuarios).
+      # jwk-set-uri: de donde el backend descarga las llaves publicas para
+      # verificar la firma -- por defecto es issuer-uri + la ruta de certs, pero
+      # en despliegues detras de un CDN (CloudFront) conviene apuntarlo directo
+      # al balanceador interno (KEYCLOAK_JWK_SET_URI), evitando depender de que
+      # el CDN reenvie bien las peticiones servidor-a-servidor.
+      issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8081/realms/customers-realm}
+      jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:${app.security.keycloak.issuer-uri}/protocol/openid-connect/certs}
+      admin:
+        # Cuenta de servicio (cliente confidencial, no el admin humano) que usa
+        # el backend para hablar con la Admin REST API de Keycloak y poder
+        # crear/editar/borrar usuarios desde la pantalla de gestion.
+        base-uri: ${KEYCLOAK_ADMIN_BASE_URI:http://localhost:8081/auth}
+        client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:customers-admin-service}
+        client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET:}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
+
+management:
+  info:
+    env:
+      # Sin esto, /actuator/info ignora las propiedades info.* que definimos
+      # por perfil (environment, descripcion) -- no viene habilitado por
+      # defecto en Spring Boot.
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info

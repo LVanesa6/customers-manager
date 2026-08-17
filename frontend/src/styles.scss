@@ -1,0 +1,49 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", Roboto, "Helvetica Neue", sans-serif;
+  background-color: #eef2f6;
+  background-image:
+    radial-gradient(750px circle at 4% 6%, rgba(0, 67, 169, 0.22), transparent 62%),
+    radial-gradient(650px circle at 98% 8%, rgba(140, 175, 190, 0.35), transparent 60%),
+    radial-gradient(850px circle at 50% 108%, rgba(0, 67, 169, 0.18), transparent 62%),
+    radial-gradient(500px circle at 30% 55%, rgba(140, 175, 190, 0.14), transparent 60%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+:root {
+  --brand-navy-dark: #002f76;
+  --brand-navy: #0043a9;
+  --brand-navy-light: #4072bf;
+  --brand-teal: #8cafbe;
+
+  --mat-sys-primary: var(--brand-navy);
+  --mat-sys-on-primary: #ffffff;
+  --mat-sys-primary-container: #d7e3ff;
+  --mat-sys-on-primary-container: var(--brand-navy-dark);
+  --mat-sys-surface-tint: var(--brand-navy);
+
+  --mat-sys-display-large-font: "Plus Jakarta Sans";
+  --mat-sys-display-medium-font: "Plus Jakarta Sans";
+  --mat-sys-display-small-font: "Plus Jakarta Sans";
+  --mat-sys-headline-large-font: "Plus Jakarta Sans";
+  --mat-sys-headline-medium-font: "Plus Jakarta Sans";
+  --mat-sys-headline-small-font: "Plus Jakarta Sans";
+  --mat-sys-title-large-font: "Plus Jakarta Sans";
+  --mat-sys-title-medium-font: "Plus Jakarta Sans";
+  --mat-sys-title-small-font: "Plus Jakarta Sans";
+  --mat-sys-body-large-font: "Plus Jakarta Sans";
+  --mat-sys-body-medium-font: "Plus Jakarta Sans";
+  --mat-sys-body-small-font: "Plus Jakarta Sans";
+  --mat-sys-label-large-font: "Plus Jakarta Sans";
+  --mat-sys-label-medium-font: "Plus Jakarta Sans";
+  --mat-sys-label-small-font: "Plus Jakarta Sans";
+}
+
+mat-toolbar.mat-primary {
+  background-color: var(--brand-navy) !important;
+  color: #ffffff !important;
+}

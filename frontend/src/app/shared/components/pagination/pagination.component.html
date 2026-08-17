@@ -1,0 +1,35 @@
+@if (totalPages() > 1) {
+  <nav class="pagination" aria-label="Paginacion">
+    <button
+      type="button"
+      class="nav-btn"
+      [disabled]="currentPage() === 1"
+      (click)="previous()"
+      aria-label="Pagina anterior">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+
+    @for (token of pages(); track $index) {
+      @if (token === '...') {
+        <span class="ellipsis">…</span>
+      } @else {
+        <button
+          type="button"
+          class="page-btn"
+          [class.active]="token === currentPage()"
+          (click)="goTo(token)">
+          {{ token }}
+        </button>
+      }
+    }
+
+    <button
+      type="button"
+      class="nav-btn"
+      [disabled]="currentPage() === totalPages()"
+      (click)="next()"
+      aria-label="Pagina siguiente">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </nav>
+}

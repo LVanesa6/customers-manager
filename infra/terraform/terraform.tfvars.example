@@ -1,0 +1,18 @@
+# Copiar a terraform.tfvars y completar (o exportar como TF_VAR_* para no
+# dejar secretos en disco). NUNCA commitear el terraform.tfvars real.
+
+aws_region   = "us-east-1"
+project_name = "cuso-customers"
+
+availability_zones = ["us-east-1a", "us-east-1b"]
+
+db_username = "customers_user"
+# db_password y keycloak_admin_password: definir via variables de entorno
+#   export TF_VAR_db_password="..."
+#   export TF_VAR_keycloak_admin_password="..."
+
+# backend_image = "123456789012.dkr.ecr.us-east-1.amazonaws.com/cuso-customers-backend:latest"
+
+# Repo de GitHub (formato "usuario/repo") autorizado a desplegar via GitHub
+# Actions con OIDC. Sin esta variable no se crea el rol IAM correspondiente.
+# github_repository = "tu-usuario-personal/customers-manager"

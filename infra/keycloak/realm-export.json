@@ -1,0 +1,106 @@
+{
+  "realm": "customers-realm",
+  "enabled": true,
+  "displayName": "Customers Manager",
+  "displayNameHtml": "<strong>Customers Manager</strong>",
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginTheme": "customers-theme",
+  "internationalizationEnabled": true,
+  "supportedLocales": ["es", "en"],
+  "defaultLocale": "es",
+  "roles": {
+    "realm": [
+      { "name": "USER", "description": "Acceso de solo lectura al catalogo de clientes" },
+      {
+        "name": "MANAGER",
+        "description": "Puede crear y actualizar clientes",
+        "composite": true,
+        "composites": { "realm": ["USER"] }
+      },
+      {
+        "name": "ADMIN",
+        "description": "Acceso total, incluyendo eliminar registros",
+        "composite": true,
+        "composites": { "realm": ["MANAGER"] }
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "customers-app",
+      "name": "Customers Angular App",
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": [
+        "http://localhost:4200/*",
+        "https://d15pfta40bgzwd.cloudfront.net/*"
+      ],
+      "webOrigins": [
+        "http://localhost:4200",
+        "https://d15pfta40bgzwd.cloudfront.net"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    },
+    {
+      "clientId": "customers-admin-service",
+      "name": "Customers Admin Service Account",
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "secret": "5bd63edb5986aba7714da342d53969055f7488ce05ec5ebb"
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "admin@bancodebogota.com.co",
+      "firstName": "Admin",
+      "lastName": "User",
+      "credentials": [
+        { "type": "password", "value": "admin123", "temporary": false }
+      ],
+      "realmRoles": ["ADMIN"]
+    },
+    {
+      "username": "manager",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "manager@bancodebogota.com.co",
+      "firstName": "Manager",
+      "lastName": "User",
+      "credentials": [
+        { "type": "password", "value": "manager123", "temporary": false }
+      ],
+      "realmRoles": ["MANAGER"]
+    },
+    {
+      "username": "user",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "user@bancodebogota.com.co",
+      "firstName": "Regular",
+      "lastName": "User",
+      "credentials": [
+        { "type": "password", "value": "user123", "temporary": false }
+      ],
+      "realmRoles": ["USER"]
+    },
+    {
+      "username": "service-account-customers-admin-service",
+      "enabled": true,
+      "serviceAccountClientId": "customers-admin-service",
+      "clientRoles": {
+        "realm-management": ["manage-users", "view-realm"]
+      }
+    }
+  ]
+}

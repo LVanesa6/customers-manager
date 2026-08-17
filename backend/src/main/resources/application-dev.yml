@@ -1,0 +1,46 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: customers-dev
+  jpa:
+    show-sql: true
+    hibernate:
+      # update: Hibernate ajusta el esquema solo cuando arranca, comodo para
+      # ir iterando el modelo sin escribir migraciones a mano.
+      ddl-auto: update
+  datasource:
+    hikari:
+      maximum-pool-size: 5
+
+# En dev se ve todo: el SQL que corre, los parametros que se bindean, y logs
+# propios en DEBUG para poder rastrear un problema sin adivinar.
+logging:
+  level:
+    root: INFO
+    com.cuso.customers: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+
+springdoc:
+  swagger-ui:
+    enabled: true
+  api-docs:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # En dev se exponen mas endpoints de actuator para poder inspeccionar
+        # el estado real de la app (config cargada, rutas, beans) sin tener
+        # que loguear a mano.
+        include: health,info,env,beans,mappings
+
+info:
+  environment: DEV
+  descripcion: Ambiente de desarrollo -- esquema autogestionado, logs verbosos, swagger habilitado
+
+app:
+  startup-message: "Ejecutando en DEV"

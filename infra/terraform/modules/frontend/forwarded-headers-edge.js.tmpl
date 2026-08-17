@@ -1,0 +1,9 @@
+'use strict';
+
+exports.handler = (event, context, callback) => {
+  const request = event.Records[0].cf.request;
+  // X-Forwarded-Proto esta en la lista de headers bloqueados incluso para
+  // Lambda@Edge en origin-request; el esquema queda fijo en KC_HOSTNAME.
+  request.headers['x-forwarded-host'] = [{ key: 'X-Forwarded-Host', value: '${public_hostname}' }];
+  callback(null, request);
+};

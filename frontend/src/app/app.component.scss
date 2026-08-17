@@ -1,0 +1,192 @@
+.nav-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 0 24px;
+  margin: 16px 16px 0;
+  width: auto;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 43, 130, 0.22);
+  position: relative;
+  z-index: 10;
+}
+
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-logo {
+  display: block;
+  height: 48px;
+  width: 240px;
+  background-image: url("/logo-white.png?v=1");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.env-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  cursor: default;
+}
+
+.env-badge.env-dev {
+  background: #ffe082;
+  color: #7a5b00;
+}
+
+.env-badge.env-prod {
+  background: #ef9a9a;
+  color: #7a0000;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  a {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 14.5px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+  }
+
+  a:hover {
+    background: rgba(255, 255, 255, 0.16);
+  }
+}
+
+.active-link {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff !important;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.user-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  button,
+  button .mat-icon {
+    color: #ffffff !important;
+  }
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  color: var(--brand-navy, #0043a9);
+  font-size: 14px;
+  font-weight: 800;
+  flex: 0 0 auto;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.25;
+}
+
+.username {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.role-badge {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: default;
+}
+
+.role-badge.role-admin {
+  background: #fde3e3;
+  color: #b3261e;
+}
+
+.role-badge.role-manager {
+  background: #fde8cc;
+  color: #9a5b00;
+}
+
+.role-badge.role-user {
+  background: #d7e3ff;
+  color: #002f76;
+}
+
+.content {
+  padding: 0;
+}
+
+/* --- Responsive --- */
+
+@media (max-width: 900px) {
+  .nav-toolbar {
+    flex-wrap: wrap;
+    height: auto !important;
+    min-height: 56px;
+    padding: 10px 16px;
+    margin: 10px 10px 0;
+    border-radius: 16px;
+    gap: 10px;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .username {
+    display: none;
+  }
+
+  .role-badge {
+    margin-top: 0;
+  }
+
+  .user-info {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand-logo {
+    height: 32px;
+    width: 160px;
+  }
+}

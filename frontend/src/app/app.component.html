@@ -1,0 +1,49 @@
+<mat-toolbar color="primary" class="nav-toolbar">
+  <div class="brand-group">
+    <div class="brand-logo"></div>
+    @if (envInfo.label(); as env) {
+      <span
+        class="env-badge"
+        [class.env-prod]="env === 'PROD'"
+        [class.env-dev]="env === 'DEV'"
+        [matTooltip]="envInfo.description() ?? ''"
+        matTooltipPosition="below">
+        {{ env }}
+      </span>
+    }
+  </div>
+
+  <nav class="nav-links">
+    <a routerLink="/customers" routerLinkActive="active-link">Clientes</a>
+    @if (auth.isAdmin()) {
+      <a routerLink="/admin/users" routerLinkActive="active-link">Usuarios</a>
+    }
+  </nav>
+
+  <span class="spacer"></span>
+
+  @if (auth.username(); as username) {
+    <div class="user-area">
+      <div class="avatar">{{ username.charAt(0).toUpperCase() }}</div>
+      <div class="user-info">
+        <span class="username">{{ username }}</span>
+        @if (auth.primaryRole(); as role) {
+          <span
+            class="role-badge"
+            [class]="'role-' + role.toLowerCase()"
+            [matTooltip]="auth.roleDescription()"
+            matTooltipPosition="below">
+            {{ auth.roleLabel() }}
+          </span>
+        }
+      </div>
+      <button mat-icon-button (click)="auth.logout()" matTooltip="Cerrar sesion" aria-label="Salir">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  }
+</mat-toolbar>
+
+<main class="content">
+  <router-outlet />
+</main>

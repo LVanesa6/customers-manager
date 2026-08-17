@@ -1,0 +1,359 @@
+/* Tema personalizado "Customers Manager" -- layout de dos columnas inspirado
+   en la plataforma de autogestion de Banco de Bogota. */
+
+:root {
+  --brand-navy-dark: #002f76;
+  --brand-navy: #0043a9;
+  --brand-navy-light: #4072bf;
+  --brand-text: #1a1a1a;
+  --brand-muted: #607d8b;
+  color-scheme: light;
+}
+
+html {
+  background: #ffffff;
+}
+
+html.login-pf,
+html.login-pf body {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: #ffffff !important;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.auth-page {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  background: #ffffff;
+}
+
+.auth-left {
+  position: relative;
+  flex: 0 0 46%;
+  max-width: 46%;
+  min-width: 380px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.auth-right {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 64px 72px;
+  box-sizing: border-box;
+  margin: 0;
+  border-radius: 0;
+  background: var(--brand-navy);
+  overflow: hidden;
+}
+
+.auth-right-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url("../img/login-hero.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  z-index: 0;
+}
+
+.auth-right-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    130deg,
+    var(--brand-navy) 0%,
+    var(--brand-navy) 38%,
+    rgba(0, 67, 169, 0.72) 58%,
+    rgba(0, 47, 118, 0.32) 100%
+  );
+  z-index: 1;
+}
+
+.auth-right-dots {
+  position: absolute;
+  left: 64px;
+  bottom: 56px;
+  width: 84px;
+  height: 84px;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.85) 3px, transparent 3.5px);
+  background-size: 21px 21px;
+  z-index: 2;
+}
+
+.auth-right-arc {
+  position: absolute;
+  right: -30px;
+  top: 40%;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 26px solid rgba(255, 255, 255, 0.12);
+  z-index: 1;
+}
+
+.auth-right-content {
+  position: relative;
+  z-index: 2;
+  max-width: 560px;
+  color: #ffffff;
+}
+
+.auth-right-content h2 {
+  margin: 0 0 20px;
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1.15;
+  text-shadow: 0 2px 16px rgba(0, 20, 60, 0.35);
+}
+
+.auth-right-content p {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 2px 16px rgba(0, 20, 60, 0.35);
+}
+
+@media (max-width: 900px) {
+  .auth-right {
+    display: none;
+  }
+
+  .auth-left {
+    flex: 1 1 auto;
+    max-width: none;
+  }
+}
+
+.login-pf-page {
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.welcome-title {
+  margin: 0 0 24px;
+  padding-left: 30px;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--brand-text);
+  text-align: left;
+  box-sizing: border-box;
+}
+
+#kc-header {
+  text-align: left;
+  margin-bottom: 32px;
+  padding-left: 30px;
+  box-sizing: border-box;
+}
+
+.brand-logo {
+  display: block;
+  width: 170px;
+  height: 170px;
+  margin: 0 0 16px;
+  background-image: url("../img/logo.png");
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: contain;
+}
+
+#kc-header-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--brand-navy);
+  letter-spacing: 0.2px;
+}
+
+.card-pf {
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.login-pf-header {
+  margin-bottom: 20px;
+}
+
+.login-pf-header h1#kc-page-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--brand-text);
+  text-align: left;
+}
+
+/* --- Formulario --- */
+
+#kc-form .form-group {
+  margin-bottom: 18px;
+}
+
+.pf-c-form__label-text {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-text);
+}
+
+.pf-c-form-control {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1.5px solid #dcdfe3;
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 15px;
+  color: #263238;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pf-c-form-control:focus {
+  outline: none;
+  border-color: var(--brand-navy);
+  box-shadow: 0 0 0 3px rgba(0, 67, 169, 0.15);
+}
+
+.pf-c-input-group {
+  display: flex;
+  align-items: stretch;
+}
+
+.pf-c-input-group .pf-c-form-control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: none;
+}
+
+.pf-c-input-group .pf-c-button {
+  border: 1.5px solid #dcdfe3;
+  border-left: none;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  background: #fafafa;
+  padding: 0 14px;
+  color: var(--brand-navy);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pf-c-input-group .pf-c-button:hover {
+  background: #f0f1f5;
+}
+
+.login-pf-settings {
+  margin-top: -4px;
+  margin-bottom: 8px;
+  font-size: 13.5px;
+}
+
+/* --- Selector de idioma --- */
+
+#kc-locale {
+  margin-bottom: 16px;
+  text-align: right;
+}
+
+#kc-current-locale-link {
+  border: 1px solid #dcdfe3;
+  border-radius: 6px;
+  background: #fafafa;
+  padding: 4px 10px;
+  font-size: 12.5px;
+  color: var(--brand-muted);
+  cursor: pointer;
+}
+
+.pf-c-dropdown__menu {
+  display: none;
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 6px 0;
+  border: 1px solid #dcdfe3;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  background: #ffffff;
+}
+
+.menu-button-links.pf-m-expanded .pf-c-dropdown__menu {
+  display: block;
+}
+
+.pf-c-dropdown__menu-item {
+  display: block;
+  padding: 6px 16px;
+  font-size: 13.5px;
+  color: #263238;
+  text-decoration: none;
+}
+
+.pf-c-dropdown__menu-item:hover {
+  background: #f0f1f5;
+}
+
+/* --- Boton principal --- */
+
+#kc-form-buttons input[type="submit"] {
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 8px;
+  padding: 13px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #ffffff;
+  background: var(--brand-navy);
+  box-shadow: 0 10px 24px rgba(0, 67, 169, 0.35);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+#kc-form-buttons input[type="submit"]:hover {
+  background: var(--brand-navy-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(0, 67, 169, 0.45);
+}
+
+#kc-form-buttons input[type="submit"]:active {
+  transform: translateY(0);
+}
+
+/* --- Pie de la tarjeta (mensajes de error, links, etc.) --- */
+
+#kc-info-wrapper,
+.login-pf-signup {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--brand-muted);
+}
+
+.alert {
+  border-radius: 8px;
+  font-size: 13.5px;
+}

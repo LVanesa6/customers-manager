@@ -1,0 +1,89 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: customers-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./infra/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_pass"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0
+    container_name: customers-keycloak
+    restart: unless-stopped
+    command: start-dev --import-realm
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: mysql
+      KC_DB_URL: jdbc:mysql://mysql:3306/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak_pass
+      KC_HEALTH_ENABLED: "true"
+      KC_HTTP_RELATIVE_PATH: /auth
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./infra/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+      - ./infra/keycloak/themes/customers-theme:/opt/keycloak/themes/customers-theme
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  backend:
+    build:
+      context: ./backend
+    container_name: customers-backend
+    restart: unless-stopped
+    profiles: ["full"]
+    environment:
+      # BACKEND_PROFILE=dev (default) o BACKEND_PROFILE=prod. Ya no se fija
+      # SERVER_PORT: cada perfil trae su propio puerto (8080 dev / 9090 prod,
+      # ver application-dev.yml / application-prod.yml) y el backend arranca
+      # de verdad en ese puerto. El frontend (nginx) recibe el mismo
+      # BACKEND_PROFILE y ajusta a cual puerto reenviar -- ver
+      # frontend/docker-entrypoint.sh.
+      SPRING_PROFILES_ACTIVE: ${BACKEND_PROFILE:-dev}
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: customers_db
+      DB_USER: customers_user
+      DB_PASSWORD: customers_pass
+      KEYCLOAK_ISSUER_URI: http://localhost:4200/auth/realms/customers-realm
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/auth/realms/customers-realm/protocol/openid-connect/certs
+      KEYCLOAK_ADMIN_BASE_URI: http://keycloak:8080/auth
+      KEYCLOAK_ADMIN_CLIENT_ID: customers-admin-service
+      KEYCLOAK_ADMIN_CLIENT_SECRET: 5bd63edb5986aba7714da342d53969055f7488ce05ec5ebb
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: customers-frontend
+    restart: unless-stopped
+    profiles: ["full"]
+    environment:
+      BACKEND_PROFILE: ${BACKEND_PROFILE:-dev}
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

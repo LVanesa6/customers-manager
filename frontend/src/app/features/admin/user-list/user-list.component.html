@@ -1,0 +1,92 @@
+<div class="page-header">
+  <div>
+    <h1>Usuarios</h1>
+    <p class="subtitle">Crea y administra los usuarios de la aplicacion y sus roles.</p>
+  </div>
+  <button mat-flat-button color="primary" routerLink="/admin/users/new">
+    <mat-icon>person_add</mat-icon>
+    Nuevo usuario
+  </button>
+</div>
+
+<div class="panel">
+  <div class="filters">
+    <div class="filters-row">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Buscar</mat-label>
+        <input matInput [ngModel]="search()" (ngModelChange)="search.set($event)" placeholder="Usuario, nombre o email" />
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Rol</mat-label>
+        <mat-select [ngModel]="roleFilter()" (ngModelChange)="roleFilter.set($event)">
+          <mat-option value="">Todos</mat-option>
+          @for (role of roles; track role) {
+            <mat-option [value]="role">{{ role }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      @if (search() || roleFilter()) {
+        <button mat-button type="button" (click)="clearFilters()">Limpiar</button>
+      }
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table mat-table [dataSource]="filteredUsers()" class="data-table">
+      <ng-container matColumnDef="username">
+        <th mat-header-cell *matHeaderCellDef>Usuario</th>
+        <td mat-cell *matCellDef="let user">{{ user.username }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Nombre</th>
+        <td mat-cell *matCellDef="let user">{{ user.firstName }} {{ user.lastName }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let user">{{ user.email }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="role">
+        <th mat-header-cell *matHeaderCellDef>Rol</th>
+        <td mat-cell *matCellDef="let user">
+          @if (user.role) {
+            <span
+              class="role-chip"
+              [class]="'role-' + user.role.toLowerCase()"
+              [matTooltip]="roleDescription(user.role)"
+              matTooltipPosition="right">
+              {{ user.role }}
+            </span>
+          } @else {
+            <span class="no-role">sin rol de app</span>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let user" class="actions-cell">
+          <button mat-icon-button (click)="edit(user)" aria-label="Editar">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            color="warn"
+            (click)="remove(user)"
+            [disabled]="user.username === auth.username()"
+            aria-label="Eliminar">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<mat-toolbar color="primary">
+  {{ customerId() ? (viewMode() ? 'Detalle del cliente' : 'Editar cliente') : 'Nuevo cliente' }}
+</mat-toolbar>
+
+<div class="page">
+  <form [formGroup]="form" (ngSubmit)="save()" class="form-card" [class.readonly]="viewMode()">
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="name" required />
+      @if (form.controls.name.hasError('required')) {
+        <mat-error>El nombre es obligatorio</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" required />
+      @if (form.controls.email.hasError('required')) {
+        <mat-error>El email es obligatorio</mat-error>
+      }
+      @if (form.controls.email.hasError('email')) {
+        <mat-error>El email no tiene un formato valido</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Telefono</mat-label>
+      <input matInput formControlName="phone" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Direccion</mat-label>
+      <input matInput formControlName="address" />
+    </mat-form-field>
+
+    <div class="actions">
+      @if (viewMode()) {
+        <button mat-button type="button" (click)="goBack()">Volver</button>
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          (click)="enableEdit()"
+          *kaHasRoles="['MANAGER', 'ADMIN']; checkRealm: true">
+          <mat-icon>edit</mat-icon>
+          Editar
+        </button>
+      } @else {
+        <button mat-button type="button" (click)="cancel()">Cancelar</button>
+        <button mat-flat-button color="primary" type="submit" [disabled]="saving()">Guardar cambios</button>
+      }
+    </div>
+  </form>
+</div>
