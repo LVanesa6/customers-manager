@@ -6,31 +6,47 @@
   <form [formGroup]="form" (ngSubmit)="save()" class="form-card" [class.readonly]="viewMode()">
     <mat-form-field appearance="outline">
       <mat-label>Nombre</mat-label>
-      <input matInput formControlName="name" required />
+      <input matInput formControlName="name" required maxlength="150" />
+      <mat-hint align="end">{{ form.controls.name.value.length }}/150</mat-hint>
       @if (form.controls.name.hasError('required')) {
         <mat-error>El nombre es obligatorio</mat-error>
+      }
+      @if (form.controls.name.hasError('maxlength')) {
+        <mat-error>Maximo 150 caracteres</mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Email</mat-label>
-      <input matInput type="email" formControlName="email" required />
+      <input matInput type="email" formControlName="email" required maxlength="150" />
+      <mat-hint align="end">{{ form.controls.email.value.length }}/150</mat-hint>
       @if (form.controls.email.hasError('required')) {
         <mat-error>El email es obligatorio</mat-error>
       }
       @if (form.controls.email.hasError('email')) {
         <mat-error>El email no tiene un formato valido</mat-error>
       }
+      @if (form.controls.email.hasError('maxlength')) {
+        <mat-error>Maximo 150 caracteres</mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Telefono</mat-label>
-      <input matInput formControlName="phone" />
+      <input matInput formControlName="phone" maxlength="30" />
+      <mat-hint align="end">{{ form.controls.phone.value.length }}/30</mat-hint>
+      @if (form.controls.phone.hasError('maxlength')) {
+        <mat-error>Maximo 30 caracteres</mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Direccion</mat-label>
-      <input matInput formControlName="address" />
+      <input matInput formControlName="address" maxlength="200" />
+      <mat-hint align="end">{{ form.controls.address.value.length }}/200</mat-hint>
+      @if (form.controls.address.hasError('maxlength')) {
+        <mat-error>Maximo 200 caracteres</mat-error>
+      }
     </mat-form-field>
 
     <div class="actions">

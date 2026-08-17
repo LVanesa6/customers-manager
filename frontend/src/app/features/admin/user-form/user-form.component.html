@@ -6,36 +6,52 @@
   <form [formGroup]="form" (ngSubmit)="save()" class="form-card" [class.readonly]="viewMode()">
     <mat-form-field appearance="outline">
       <mat-label>Usuario</mat-label>
-      <input matInput formControlName="username" required />
+      <input matInput formControlName="username" required maxlength="100" />
+      <mat-hint align="end">{{ form.controls.username.value.length }}/100</mat-hint>
       @if (form.controls.username.hasError('required')) {
         <mat-error>El usuario es obligatorio</mat-error>
+      }
+      @if (form.controls.username.hasError('maxlength')) {
+        <mat-error>Maximo 100 caracteres</mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Email</mat-label>
-      <input matInput type="email" formControlName="email" required />
+      <input matInput type="email" formControlName="email" required maxlength="150" />
+      <mat-hint align="end">{{ form.controls.email.value.length }}/150</mat-hint>
       @if (form.controls.email.hasError('required')) {
         <mat-error>El email es obligatorio</mat-error>
       }
       @if (form.controls.email.hasError('email')) {
         <mat-error>El email no tiene un formato valido</mat-error>
       }
+      @if (form.controls.email.hasError('maxlength')) {
+        <mat-error>Maximo 150 caracteres</mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Nombre</mat-label>
-      <input matInput formControlName="firstName" required />
+      <input matInput formControlName="firstName" required maxlength="100" />
+      <mat-hint align="end">{{ form.controls.firstName.value.length }}/100</mat-hint>
       @if (form.controls.firstName.hasError('required')) {
         <mat-error>El nombre es obligatorio</mat-error>
+      }
+      @if (form.controls.firstName.hasError('maxlength')) {
+        <mat-error>Maximo 100 caracteres</mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Apellido</mat-label>
-      <input matInput formControlName="lastName" required />
+      <input matInput formControlName="lastName" required maxlength="100" />
+      <mat-hint align="end">{{ form.controls.lastName.value.length }}/100</mat-hint>
       @if (form.controls.lastName.hasError('required')) {
         <mat-error>El apellido es obligatorio</mat-error>
+      }
+      @if (form.controls.lastName.hasError('maxlength')) {
+        <mat-error>Maximo 100 caracteres</mat-error>
       }
     </mat-form-field>
 

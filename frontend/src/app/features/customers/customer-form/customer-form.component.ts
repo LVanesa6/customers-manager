@@ -81,6 +81,7 @@ export class CustomerFormComponent implements OnInit {
   save(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.snackBar.open('Revisa los campos marcados en rojo', 'Cerrar', { duration: 3000 });
       return;
     }
 

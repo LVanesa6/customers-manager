@@ -133,6 +133,14 @@ Tambien se puede levantar todo de una (frontend y backend dockerizados, backend 
 docker compose --profile full up -d --build
 ```
 
+Y si quieres probar el ambiente `prod` completo en local (puerto 9090, `ddl-auto: validate`,
+Swagger apagado, logs mas silenciosos), es la misma orden pasando `BACKEND_PROFILE=prod` --
+el frontend tambien lee esa variable para saber a que puerto del backend enrutar:
+
+```bash
+BACKEND_PROFILE=prod docker compose --profile full up -d --build
+```
+
 ## Tests
 
 ```bash
