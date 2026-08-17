@@ -34,6 +34,16 @@
     </div>
   </div>
 
+  @if (loadError()) {
+    <div class="load-error">
+      <mat-icon>error_outline</mat-icon>
+      <p>No se pudieron cargar los usuarios. Puede ser un problema de red pasajero.</p>
+      <button mat-flat-button color="primary" type="button" (click)="load()">
+        <mat-icon>refresh</mat-icon>
+        Reintentar
+      </button>
+    </div>
+  } @else {
   <div class="table-wrapper">
     <table mat-table [dataSource]="filteredUsers()" class="data-table">
       <ng-container matColumnDef="username">
@@ -89,4 +99,5 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
   </div>
+  }
 </div>

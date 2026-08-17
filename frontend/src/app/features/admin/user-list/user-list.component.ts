@@ -48,6 +48,7 @@ export class UserListComponent implements OnInit {
   readonly displayedColumns = ['username', 'name', 'email', 'role', 'actions'];
   readonly users = signal<AppUser[]>([]);
   readonly loading = signal(false);
+  readonly loadError = signal(false);
 
   readonly search = signal('');
   readonly roleFilter = signal<AppRole | ''>('');
@@ -78,12 +79,14 @@ export class UserListComponent implements OnInit {
 
   load(): void {
     this.loading.set(true);
+    this.loadError.set(false);
     this.userService.findAll().subscribe({
       next: (users) => {
         this.users.set(users);
         this.loading.set(false);
       },
       error: () => {
+        this.loadError.set(true);
         this.snackBar.open('Error al cargar los usuarios', 'Cerrar', { duration: 3000 });
         this.loading.set(false);
       },

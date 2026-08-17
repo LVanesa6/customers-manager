@@ -63,6 +63,28 @@
   overflow-x: auto;
 }
 
+.load-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px 24px;
+  text-align: center;
+  color: #697386;
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    color: #b3261e;
+  }
+
+  p {
+    margin: 0 0 8px;
+    max-width: 360px;
+  }
+}
+
 .data-table {
   width: 100%;
 

@@ -61,6 +61,16 @@
     }
   </form>
 
+  @if (loadError()) {
+    <div class="load-error">
+      <mat-icon>error_outline</mat-icon>
+      <p>No se pudieron cargar los clientes. Puede ser un problema de red pasajero.</p>
+      <button mat-flat-button color="primary" type="button" (click)="loadPage()">
+        <mat-icon>refresh</mat-icon>
+        Reintentar
+      </button>
+    </div>
+  } @else {
   <div class="table-wrapper">
     <table mat-table [dataSource]="customers()" class="data-table">
       <ng-container matColumnDef="name">
@@ -111,4 +121,5 @@
     [totalElements]="totalElements()"
     (pageChange)="onPageChange($event)">
   </app-pagination>
+  }
 </div>

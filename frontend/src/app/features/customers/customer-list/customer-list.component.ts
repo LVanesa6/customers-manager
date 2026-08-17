@@ -62,6 +62,7 @@ export class CustomerListComponent implements OnInit {
   readonly pageIndex = signal(0);
   readonly pageSize = signal(10);
   readonly loading = signal(false);
+  readonly loadError = signal(false);
   readonly filtersExpanded = signal(false);
 
   readonly filterForm = this.fb.nonNullable.group({
@@ -105,6 +106,7 @@ export class CustomerListComponent implements OnInit {
 
   loadPage(): void {
     this.loading.set(true);
+    this.loadError.set(false);
     const raw = this.filterForm.getRawValue();
     const filter = {
       name: raw.name,
@@ -122,6 +124,7 @@ export class CustomerListComponent implements OnInit {
         this.loading.set(false);
       },
       error: () => {
+        this.loadError.set(true);
         this.snackBar.open('Error al cargar los clientes', 'Cerrar', { duration: 3000 });
         this.loading.set(false);
       },
